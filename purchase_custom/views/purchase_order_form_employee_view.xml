@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="purchase_order_form_employee_inherite" model="ir.ui.view">
+        <field name="name">purchase.order.form.employee.inherited</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']"  position="attributes">
+                <attribute name="attrs">{'invisible': ['|', ('employee_id', '=', False), ('is_acquisition', '=', False)]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="employee_id" invisible="1"/>
+                <field name="is_acquisition" invisible="1"/>
+                <field name="department_id" attrs="{'invisible': [('is_acquisition', '!=', False)]}"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
