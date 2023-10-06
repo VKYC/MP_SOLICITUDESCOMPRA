@@ -17,11 +17,12 @@ class PurchaseOrder(models.Model):
         return defaults
 
     def _compute_employee_id(self):
-        employee_id = self.env['hr.employee'].search([('user_id', '=', self.env.context.get('uid'))])
-        if not employee_id:
-            raise UserError(_('There is no employee related to this user.'))
-        else:
-            self.employee_id = employee_id
+        for purchase_order_id in self:
+            employee_id = self.env['hr.employee'].search([('user_id', '=', self.env.context.get('uid'))])
+            if not employee_id:
+                raise UserError(_('There is no employee related to this user.'))
+            else:
+                purchase_order_id.employee_id = employee_id
 
     @api.model_create_multi
     def create(self, vals_list):
