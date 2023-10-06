@@ -5,7 +5,7 @@ from odoo.exceptions import UserError
 class PurchaseOrder(models.Model):
     _inherit = 'purchase.order'
 
-    employee_id = fields.Many2one('hr.employee', compute='_compute_employee_id', compute_sudo=True, store=True)
+    employee_id = fields.Many2one('hr.employee', compute='_compute_employee_id', compute_sudo=True)
     department_id = fields.Many2one('hr.department')
     is_acquisition = fields.Boolean(related='employee_id.department_id.is_acquisition')
     partner_id = fields.Many2one(required=False)
