@@ -9,6 +9,7 @@ class PurchaseOrder(models.Model):
     department_id = fields.Many2one('hr.department')
     is_acquisition = fields.Boolean(related='employee_id.department_id.is_acquisition')
     partner_id = fields.Many2one(required=False)
+    request_user_id = fields.Many2one('res.partner')
 
     @api.model
     def default_get(self, fields_list):
@@ -33,5 +34,12 @@ class PurchaseOrder(models.Model):
             if not val['partner_id']:
                 val['partner_id'] = self.env.user.partner_id.id
             val['employee_id'] = employee_id.id
+            val['request_user_id'] = self.env.user.partner_id.id
         res = super().create(vals_list)
+        return res
+
+    def button_confirm(self):
+        res = super(PurchaseOrder, self).button_confirm()
+        if self.partner_id == self.request_user_id:
+            raise UserError(_('The provider cannot be the same as the requesting user, please correct.'))
         return res
