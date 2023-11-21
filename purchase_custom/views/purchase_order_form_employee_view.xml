@@ -10,9 +10,11 @@
             </xpath>
             <xpath expr="//field[@name='partner_id']" position="after">
                 <field name="employee_id" invisible="1"/>
+                <field name="employee_departament_id" invisible="1"/>
                 <field name="is_acquisition" invisible="1"/>
                 <field name="request_user_id" invisible="1"/>
-                <field name="department_id" attrs="{'invisible': [('is_acquisition', '!=', False)]}"/>
+                <field name="department_id" attrs="{'invisible': [('is_acquisition', '!=', False)]}"
+                       options="{'no_create': True}"/>
             </xpath>
             <xpath expr='//header' position="replace">
                 <header attrs="{'invisible': [('is_acquisition', '!=', False)]}">
