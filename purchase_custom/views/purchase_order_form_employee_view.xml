@@ -5,21 +5,18 @@
         <field name="model">purchase.order</field>
         <field name="inherit_id" ref="purchase.purchase_order_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='partner_id']"  position="attributes">
-                <attribute name="attrs">{'invisible': [('is_acquisition', '=', False)]}</attribute>
-            </xpath>
             <xpath expr="//field[@name='partner_id']" position="after">
                 <field name="employee_id" invisible="1"/>
                 <field name="employee_departament_id" invisible="1"/>
                 <field name="is_acquisition" invisible="1"/>
                 <field name="request_user_id" invisible="1"/>
                 <field name="department_id" attrs="{'invisible': [('is_acquisition', '!=', False)]}"
-                       options="{'no_create': True}"/>
+                        options="{'no_create': True}"/>
             </xpath>
             <xpath expr='//header' position="replace">
                 <header attrs="{'invisible': [('is_acquisition', '!=', False)]}">
-                    <button name="button_cancel" states="draft,to approve,sent,purchase" string="Cancel" type="object" data-hotkey="x" />
-                    <field name="state" widget="statusbar" statusbar_visible="draft,sent,purchase" readonly="1"/>
+                    <button name="button_cancel" states="draft,limit_approval,to approve,sent,purchase" string="Cancel" type="object" data-hotkey="x" />
+                    <field name="state" widget="statusbar" statusbar_visible="draft,limit_approval,sent,purchase," readonly="1"/>
                 </header>
                 <header attrs="{'invisible': [('is_acquisition', '=', False)]}">
                     <button name="action_rfq_send" states="draft" string="Send by Email" type="object" context="{'send_rfq':True}" class="oe_highlight" data-hotkey="g"/>
@@ -37,7 +34,7 @@
                     <button name="button_cancel" states="draft,to approve,sent,purchase" string="Cancel" type="object" data-hotkey="x" />
                     <button name="button_done" type="object" string="Lock" states="purchase" data-hotkey="l"/>
                     <button name="button_unlock" type="object" string="Unlock" states="done" groups="purchase.group_purchase_manager" data-hotkey="l"/>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,sent,purchase" readonly="1"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,limit_approval,sent,purchase," readonly="1"/>
                 </header>
             </xpath>
         </field>

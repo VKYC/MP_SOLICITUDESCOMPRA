@@ -1,0 +1,82 @@
+<odoo>
+  <data>
+      <record id="stock_request_user_custom_form" model="ir.ui.view">
+          <field name="name">view.stock.request.user.custom.form</field>
+          <field name="model">purchase.order</field>
+          <field name="inherit_id" ref="purchase.purchase_order_form"/>
+          <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+              <button name="action_approve_limit" string="Approve Limit" states="limit_approval" class="oe_highlight" groups="purchase.group_purchase_manager"/>
+          </xpath>
+              <xpath expr="//field[@name='partner_id']" position="attributes">
+                  <attribute name="attrs">{'invisible': [('is_acquisition', '=', False)]}</attribute>
+              </xpath>
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="limit_config_id" string="Configuración de Límite" groups="purchase.group_purchase_manager"/>
+                <field name="current_limit" widget="monetary" string="Límite Actual"/>
+            </xpath>
+          </field>
+      </record>
+
+      <record id="view_purchase_order_limit_config_form" model="ir.ui.view">
+        <field name="name">purchase.order.limit.config.form</field>
+        <field name="model">purchase.limit.config</field>
+        <field name="arch" type="xml">
+            <form string="Configuración del Límite de Compras">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name_config" class="oe_edit_only"/>
+                        <h1><field name="name_config" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="quantity_limit" string="Cantidad limite de compra"/>
+                            <field name="current_limit" string="Límite Actual de compra"/>
+                        </group>
+                        <group>
+                            <field name="create_date" readonly="1" string="Fecha de Creación"/>
+                            <field name="write_date" readonly="1" string="Última Modificación"/>
+                            <field name="write_uid" readonly="1" string="Modificado Por"/>
+                        </group>
+                    </group>
+                    <separator string="Nota"/>
+                    <group>
+                        <field name="note" widget="text" placeholder="Agrega aquí tu nota..."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+      <record id="action_purchase_order_limit_config" model="ir.actions.act_window">
+        <field name="name">Configuracion del limite de compras</field>
+        <field name="res_model">purchase.limit.config</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_purchase_order_limit_config_form"/>
+        <field name="context">{'create': False}</field>
+    </record>
+
+    <menuitem
+    id="menu_purchase_order_limit_config"
+    name="Configuracion del limite de compras"
+    parent="purchase.menu_purchase_config"
+    sequence="5"
+    action="action_purchase_order_limit_config"/>
+
+    <record model="ir.ui.menu" id="purchase.menu_purchase_form_action">
+      <field name="groups_id" eval="[(6,0,[ref('purchase.group_purchase_manager')])]"/>
+    </record>
+    <record model="ir.ui.menu" id="l10n_cl_fe.menu_upload_xml">
+      <field name="groups_id" eval="[(6,0,[ref('purchase.group_purchase_manager')])]"/>
+    </record>
+    <record model="ir.ui.menu" id="purchase.menu_procurement_management_supplier_name">
+      <field name="groups_id" eval="[(6,0,[ref('purchase.group_purchase_manager')])]"/>
+    </record>
+    <record model="ir.ui.menu" id="purchase.menu_purchase_products">
+      <field name="groups_id" eval="[(6,0,[ref('purchase.group_purchase_manager')])]"/>
+    </record>
+    <record model="ir.ui.menu" id="purchase_requisition.menu_purchase_requisition_pro_mgt">
+      <field name="groups_id" eval="[(6,0,[ref('purchase.group_purchase_manager')])]"/>
+    </record>
+  </data>
+</odoo>
