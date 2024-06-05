@@ -11,8 +11,8 @@
               <xpath expr="//field[@name='partner_id']" position="attributes">
                   <attribute name="attrs">{'invisible': [('is_acquisition', '=', False)]}</attribute>
               </xpath>
-            <xpath expr="//field[@name='partner_id']" position="after">
-                <field name="limit_config_id" string="Configuración de Límite" groups="purchase.group_purchase_manager"/>
+            <xpath expr="//field[@name='partner_id']" position="before">
+                <field name="limit_config_id" string="Configuración de Límite" groups="purchase.group_purchase_manager" attrs="{'readonly': [('id', '!=', False)]}"/>
                 <field name="current_limit" widget="monetary" string="Límite Actual"/>
             </xpath>
           </field>
