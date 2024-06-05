@@ -12,7 +12,7 @@ class PurchaseOrder(models.Model):
     partner_id = fields.Many2one(required=False)
     request_user_id = fields.Many2one('res.partner')
 
-    limit_config_id = fields.Many2one('purchase.limit.config', string='Configuración de Límite', default=lambda self: self.env['purchase.limit.config'].search([], limit=1).id)
+    limit_config_id = fields.Many2one('purchase.limit.config', string='Configuración de Límite', default=lambda self: self.env['purchase.limit.config'].search([],order='id desc', limit=1).id)
     current_limit = fields.Float(string='Límite Actual', related='limit_config_id.current_limit', store=True, readonly=True)
     state = fields.Selection([
         ('draft', 'RFQ'),
@@ -69,7 +69,7 @@ class PurchaseOrder(models.Model):
 
     def write(self, vals):
         res = super(PurchaseOrder, self).write(vals)
-        if 'order_line' in vals or 'current_limit' in vals:
+        if vals.get('order_line'):
             self.check_amount_limit()
         return res
 
@@ -81,6 +81,7 @@ class PurchaseOrder(models.Model):
                 order_amount = sum(line.price_unit * line.product_qty for line in order.order_line)
                 if order_amount > max_amount_limit:
                     order.write({'state': 'limit_approval'})
+                    raise UserError(_('La orden de compra excede el límite permitido. Se ha cambiado el estado a "Autorización por Límite".'))
                 else:
                     order.write({'state': 'draft'})
 
