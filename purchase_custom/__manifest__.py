@@ -9,6 +9,6 @@
         'security/ir.model.access.csv',
         'views/hr_department_views.xml',
         'views/purchase_order_form_employee_view.xml',
-        'views/stock_request_user_custom_views.xml',
+        'views/purcharse_order_user_custom_views.xml',
     ],
 }

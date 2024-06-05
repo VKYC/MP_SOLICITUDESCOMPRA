@@ -1,7 +1,7 @@
 <odoo>
   <data>
-      <record id="stock_request_user_custom_form" model="ir.ui.view">
-          <field name="name">view.stock.request.user.custom.form</field>
+      <record id="purcharse_order_user_custom_form" model="ir.ui.view">
+          <field name="name">view.purcharse.order.user.custom.form</field>
           <field name="model">purchase.order</field>
           <field name="inherit_id" ref="purchase.purchase_order_form"/>
           <field name="arch" type="xml">
@@ -11,8 +11,8 @@
               <xpath expr="//field[@name='partner_id']" position="attributes">
                   <attribute name="attrs">{'invisible': [('is_acquisition', '=', False)]}</attribute>
               </xpath>
-            <xpath expr="//field[@name='partner_id']" position="after">
-                <field name="limit_config_id" string="Configuración de Límite" groups="purchase.group_purchase_manager"/>
+            <xpath expr="//field[@name='partner_id']" position="before">
+                <field name="limit_config_id" string="Configuración de Límite" groups="purchase.group_purchase_manager" attrs="{'readonly': [('id', '!=', False)]}"/>
                 <field name="current_limit" widget="monetary" string="Límite Actual"/>
             </xpath>
           </field>

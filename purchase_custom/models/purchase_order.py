@@ -61,30 +61,48 @@ class PurchaseOrder(models.Model):
             raise UserError(_('The provider cannot be the same as the requesting user, please correct.'))
         return res
 
-    @api.model
-    def create(self, vals):
-        order = super(PurchaseOrder, self).create(vals)
-        order.check_amount_limit()
-        return order
 
-    def write(self, vals):
-        res = super(PurchaseOrder, self).write(vals)
-        if vals.get('order_line'):
-            self.check_amount_limit()
-        return res
-
-    @api.constrains('order_line')
-    def check_amount_limit(self):
+    def _get_order_state(self):
         for order in self:
             max_amount_limit = order.current_limit
             if max_amount_limit:
                 order_amount = sum(line.price_unit * line.product_qty for line in order.order_line)
                 if order_amount > max_amount_limit:
-                    order.write({'state': 'limit_approval'})
-                    raise UserError(_('La orden de compra excede el límite permitido. Se ha cambiado el estado a "Autorización por Límite".'))
-                else:
-                    order.write({'state': 'draft'})
+                    order.message_post(
+                        body='El monto del pedido ha excedido el límite permitido pasara a un estado de "Autorizacion por limite".',
+                        message_type='notification'
+                    )
+                    return 'limit_approval'
+        return 'draft'
 
+    @api.model
+    def create(self, vals):
+        order = super(PurchaseOrder, self).create(vals)
+        order.write({'state': order._get_order_state()})
+        return order
+
+    def write(self, vals):
+        res = super(PurchaseOrder, self).write(vals)
+        if 'order_line' in vals or 'current_limit' in vals:
+            for order in self:
+                order.write({'state': order._get_order_state()})
+        return res
+
+    def write(self, vals):
+        res = super(PurchaseOrder, self).write(vals)
+        for order in self:
+            if 'state' in vals and vals['state'] == 'limit_approval':
+                employee = order.env.user.employee_id
+                if employee and employee.parent_id:
+                    order.env['mail.activity'].create({
+                        'res_id': order.id,
+                        'res_model_id': order.env.ref('purchase.model_purchase_order').id,
+                        'summary': 'Revisar orden con límite de compra excedido',
+                        'note': 'La orden de compra %s ha excedido el límite de compra.' % (order.name),
+                        'user_id': employee.parent_id.user_id.id,
+                    })
+        return res
+    
     def action_approve_limit(self):
         for order in self:
             order._validate_limit_approval()
@@ -97,23 +115,9 @@ class PurchaseOrder(models.Model):
                 raise UserError(_("La orden no está en estado 'Autorización por Límite'."))
 
     def _check_manager_permission(self):
-        user = self.env.user
-        if not user.has_group('purchase.group_purchase_manager'):
-            raise UserError(_("Solo los administradores pueden aprobar la orden."))
-
-    def write(self, vals):
-        res = super(PurchaseOrder, self).write(vals)
         for order in self:
-            if 'state' in vals and vals['state'] == 'limit_approval':
-                group = self.env.ref('purchase.group_purchase_manager')
-                users = group.users
-
-                for user in users:
-                    self.env['mail.activity'].create({
-                        'res_id': order.id,
-                        'res_model_id': self.env.ref('purchase.model_purchase_order').id,
-                        'summary': 'Revisar orden con límite de compra excedido',
-                        'note': 'La orden de compra %s ha excedido el límite de compra.' % (order.name),
-                        'user_id': user.id,
-                    })
-        return res
+            employee = order.env.user.employee_id
+            if employee and employee.parent_id:
+                if order.env.user == employee.parent_id.user_id:
+                    return
+            raise UserError(_("Solo el gerente del empleado puede aprobar la orden."))
