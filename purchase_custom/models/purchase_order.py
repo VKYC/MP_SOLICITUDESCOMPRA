@@ -102,22 +102,18 @@ class PurchaseOrder(models.Model):
                         'user_id': employee.parent_id.user_id.id,
                     })
         return res
-    
-    def action_approve_limit(self):
-        for order in self:
-            order._validate_limit_approval()
-            order._check_manager_permission()
-            order.write({'state': 'sent'})
-
-    def _validate_limit_approval(self):
-        for order in self:
-            if order.state != 'limit_approval':
-                raise UserError(_("La orden no está en estado 'Autorización por Límite'."))
 
     def _check_manager_permission(self):
         for order in self:
-            employee = order.env.user.employee_id
-            if employee and employee.parent_id:
-                if order.env.user == employee.parent_id.user_id:
-                    return
-            raise UserError(_("Solo el gerente del empleado puede aprobar la orden."))
+            created_by_user = order.create_uid
+            created_by_employee = created_by_user.employee_id
+            if created_by_employee and created_by_employee.parent_id:
+                if order.env.user == created_by_employee.parent_id.user_id:
+                    return True
+        return False
+
+    def action_approve_limit(self):
+        for order in self:
+            if not order._check_manager_permission():
+                raise UserError(_("Solo el gerente del empleado puede aprobar la orden."))
+            order.write({'state': 'draft'})
