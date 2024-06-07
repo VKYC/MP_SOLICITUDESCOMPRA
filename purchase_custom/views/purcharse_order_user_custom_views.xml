@@ -7,7 +7,7 @@
           <field name="arch" type="xml">
             <xpath expr='//header' position="replace">
               <header>
-                  <button name="action_approve_limit" string="Approve Limit" states="limit_approval" class="oe_highlight" type="object" groups="purchase.group_purchase_manager"/>
+                  <button name="action_approve_limit" string="Aprobar limite" states="limit_approval" class="oe_highlight" type="object" groups="purchase.group_purchase_manager"/>
                   <field name="state" widget="statusbar" statusbar_visible="draft,limit_approval,sent,purchase," readonly="1"/>
               </header>
           </xpath>
