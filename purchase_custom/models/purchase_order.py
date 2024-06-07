@@ -68,10 +68,13 @@ class PurchaseOrder(models.Model):
             if max_amount_limit:
                 order_amount = sum(line.price_unit * line.product_qty for line in order.order_line)
                 if order_amount > max_amount_limit:
-                    order.message_post(
-                        body='El monto del pedido ha excedido el límite permitido pasara a un estado de "Autorizacion por limite".',
-                        message_type='notification'
-                    )
+                    odoobot = self.env.ref('base.partner_root')
+                    if odoobot:
+                        order.message_post(
+                            body='El monto del pedido ha excedido el límite permitido y pasará a un estado de "Autorización por límite".',
+                            message_type='notification',
+                            partner_ids=[odoobot.id]
+                        )
                     return 'limit_approval'
         return 'draft'
 
@@ -115,5 +118,5 @@ class PurchaseOrder(models.Model):
     def action_approve_limit(self):
         for order in self:
             if not order._check_manager_permission():
-                raise UserError(_("Solo el gerente del empleado puede aprobar la orden."))
+                raise UserError(_("Solo el gerente del departamento del empleado puede aprobar la orden."))
             order.write({'state': 'draft'})
