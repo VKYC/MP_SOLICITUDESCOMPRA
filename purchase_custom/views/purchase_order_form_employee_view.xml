@@ -16,7 +16,7 @@
             <xpath expr='//header' position="replace">
                 <header attrs="{'invisible': [('is_acquisition', '!=', False)]}">
                     <button name="button_cancel" states="draft,to approve,sent,purchase" string="Cancel" type="object" data-hotkey="x" />
-                    <field name="state" widget="statusbar" statusbar_visible="draft,sent,purchase," readonly="1"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,limit_approval,sent,purchase," readonly="1"/>
                 </header>
                 <header attrs="{'invisible': [('is_acquisition', '=', False)]}">
                     <button name="action_rfq_send" states="draft" string="Send by Email" type="object" context="{'send_rfq':True}" class="oe_highlight" data-hotkey="g"/>
@@ -34,7 +34,7 @@
                     <button name="button_cancel" states="draft,to approve,sent,purchase" string="Cancel" type="object" data-hotkey="x" />
                     <button name="button_done" type="object" string="Lock" states="purchase" data-hotkey="l"/>
                     <button name="button_unlock" type="object" string="Unlock" states="done" groups="purchase.group_purchase_manager" data-hotkey="l"/>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,sent,purchase," readonly="1"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,limit_approval,sent,purchase," readonly="1"/>
                 </header>
             </xpath>
         </field>
