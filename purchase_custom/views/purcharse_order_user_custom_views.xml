@@ -21,10 +21,12 @@
             <xpath expr="//field[@name='account_analytic_id']" position="attributes">
               <attribute name="options">{'no_create': True, 'no_open': True}</attribute>
               <attribute name="context">{'create': False, 'edit': False}</attribute>
+              <attribute name="required">True</attribute>
             </xpath>
             <xpath expr="//field[@name='analytic_tag_ids']" position="attributes">
               <attribute name="options">{'no_create': True, 'no_open': True}</attribute>
               <attribute name="context">{'create': False, 'edit': False}</attribute>
+              <attribute name="required">True</attribute>
             </xpath>
             <xpath expr="//field[@name='product_uom']" position="attributes">
               <attribute name="options">{'no_create': True, 'no_open': True}</attribute>
