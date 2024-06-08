@@ -12,7 +12,7 @@ class PurchaseOrder(models.Model):
     partner_id = fields.Many2one(required=False)
     request_user_id = fields.Many2one('res.partner')
 
-    limit_config_id = fields.Many2one('purchase.limit.config', string='Configuración de Límite')
+    limit_config_id = fields.Many2one('purchase.limit.config', string='Configuración de Límite', default=lambda self: self.env['purchase.limit.config'].search([],order='id desc', limit=1).id)
     current_limit = fields.Float(string='Límite Actual', related='limit_config_id.current_limit', store=True, readonly=True)
     state = fields.Selection([
         ('draft', 'RFQ'),
