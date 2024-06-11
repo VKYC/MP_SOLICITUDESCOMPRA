@@ -12,9 +12,10 @@
               </header>
           </xpath>
               <xpath expr="//field[@name='partner_id']" position="attributes">
-                  <attribute name="groups">purchase.group_purchase_manager</attribute>
+                  <attribute name="attrs">{'invisible': [('show_partner_id', '=', False)]}</attribute>
               </xpath>
             <xpath expr="//field[@name='partner_id']" position="before">
+                <field name="show_partner_id" invisible="1"/>
                 <field name="limit_config_id" string="Configuración de Límite" groups="purchase.group_purchase_manager" readonly="1"/>
                 <field name="current_limit" widget="monetary" string="Límite Actual"/>
             </xpath>
@@ -31,6 +32,9 @@
             <xpath expr="//field[@name='product_uom']" position="attributes">
               <attribute name="options">{'no_create': True, 'no_open': True}</attribute>
               <attribute name="context">{'create': False, 'edit': False}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='account_analytic_id']" position="before">
+              <field name="product_type" string="Tipo de producto" groups="purchase.group_purchase_manager" readonly="1"/>
             </xpath>
           </field>
         </record>
