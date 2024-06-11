@@ -1,5 +1,6 @@
 from odoo import api, fields, _, models, exceptions
 from odoo.exceptions import UserError
+from odoo.exceptions import ValidationError
 
 
 class PurchaseOrder(models.Model):
@@ -11,6 +12,8 @@ class PurchaseOrder(models.Model):
     is_acquisition = fields.Boolean(related='employee_id.department_id.is_acquisition')
     partner_id = fields.Many2one(required=False)
     request_user_id = fields.Many2one('res.partner')
+    product_type = fields.Selection(related="order_line.product_id.product_tmpl_id.type", string="Tipo de Producto", readonly=True)
+    show_partner_id = fields.Boolean(string="Show Partner ID", compute='_compute_show_partner_id')
 
     limit_config_id = fields.Many2one('purchase.limit.config', string='Configuración de Límite', default=lambda self: self.env['purchase.limit.config'].search([],order='id desc', limit=1).id)
     current_limit = fields.Float(string='Límite Actual', related='limit_config_id.current_limit', store=True, readonly=True)
@@ -120,3 +123,25 @@ class PurchaseOrder(models.Model):
             if not order._check_manager_permission():
                 raise UserError(_("Solo el gerente del departamento del empleado puede aprobar la orden."))
             order.write({'state': 'draft'})
+
+    @api.depends('product_id')
+    def _compute_show_partner_id(self):
+        for record in self:
+            if self.env.user.has_group('purchase.group_purchase_manager'):
+                record.show_partner_id = True
+            elif record.product_id:
+                record.show_partner_id = (
+                    record.product_id.product_tmpl_id.detailed_type == 'service' and
+                    record.product_id.type == 'service'
+                )
+            else:
+                record.show_partner_id = False
+
+    @api.constrains('order_line')
+    def _check_product_types(self):
+        for order in self:
+            for line in order.order_line:
+                if line.product_type == 'service':
+                    other_product_types = order.order_line.filtered(lambda x: x != line and x.product_type)
+                    if any(line.product_type != 'service' for line in other_product_types):
+                        raise ValidationError('Los productos de tipo "service" no pueden combinarse con otros tipos de productos.')
