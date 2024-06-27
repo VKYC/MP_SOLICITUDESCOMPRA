@@ -12,7 +12,7 @@
               </header>
           </xpath>
               <xpath expr="//field[@name='partner_id']" position="attributes">
-                  <attribute name="attrs">{'invisible': [('show_partner_id', '=', False)]}</attribute>
+                  <attribute name="attrs">{'invisible': [('show_partner_id', '=', False), ('see_supplier', '=', False)]}</attribute>
               </xpath>
             <xpath expr="//field[@name='partner_id']" position="before">
                 <field name="show_partner_id" invisible="1"/>
@@ -35,6 +35,9 @@
             </xpath>
             <xpath expr="//field[@name='account_analytic_id']" position="before">
               <field name="product_type" string="Tipo de producto" groups="purchase.group_purchase_manager" readonly="1"/>
+            </xpath>
+            <xpath expr="//field[@name='currency_id']" position="after">
+              <field name="is_foreign" string="¿Es compra extranjera?"/>
             </xpath>
           </field>
         </record>
