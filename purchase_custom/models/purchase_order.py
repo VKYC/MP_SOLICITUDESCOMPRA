@@ -10,6 +10,8 @@ class PurchaseOrder(models.Model):
     employee_departament_id = fields.Many2one(related="employee_id.department_id")
     department_id = fields.Many2one('hr.department', domain='[("id", "=", employee_departament_id)]')
     is_acquisition = fields.Boolean(related='employee_id.department_id.is_acquisition')
+    see_supplier = fields.Boolean(related='employee_id.department_id.see_supplier')
+    is_foreign = fields.Boolean(default=False)
     partner_id = fields.Many2one(required=False)
     request_user_id = fields.Many2one('res.partner')
     product_type = fields.Selection(related="order_line.product_id.product_tmpl_id.type", string="Tipo de Producto", readonly=True)
@@ -140,8 +142,13 @@ class PurchaseOrder(models.Model):
     @api.constrains('order_line')
     def _check_product_types(self):
         for order in self:
-            for line in order.order_line:
-                if line.product_type == 'service':
-                    other_product_types = order.order_line.filtered(lambda x: x != line and x.product_type)
-                    if any(line.product_type != 'service' for line in other_product_types):
-                        raise ValidationError('Los productos de tipo "service" no pueden combinarse con otros tipos de productos.')
+            if not order.is_foreign:
+                for line in order.order_line:
+                    if line.product_type == 'service':
+                        other_product_types = order.order_line.filtered(lambda x: x != line and x.product_type)
+                        if any(line.product_type != 'service' for line in other_product_types):
+                            raise ValidationError('Los productos de tipo "service" no pueden combinarse con otros tipos de productos.')
+                    elif line.product_type == 'product':
+                        other_product_types = order.order_line.filtered(lambda x: x != line and x.product_type)
+                        if any(x.product_type == 'consu' for x in other_product_types):
+                            raise ValidationError('Los productos de tipo "product" no pueden combinarse con productos de tipo "consu".')

@@ -9,6 +9,7 @@
                 <field name="employee_id" invisible="1"/>
                 <field name="employee_departament_id" invisible="1"/>
                 <field name="is_acquisition" invisible="1"/>
+                <field name="see_supplier" invisible="1"/>
                 <field name="request_user_id" invisible="1"/>
                 <field name="department_id" attrs="{'invisible': [('is_acquisition', '!=', False)]}"
                         options="{'no_create': True}"/>
