@@ -152,3 +152,13 @@ class PurchaseOrder(models.Model):
                         other_product_types = order.order_line.filtered(lambda x: x != line and x.product_type)
                         if any(x.product_type == 'consu' for x in other_product_types):
                             raise ValidationError('Los productos de tipo "product" no pueden combinarse con productos de tipo "consu".')
+
+    @api.onchange('is_foreign')
+    def _onchange_is_foreign(self):
+        if self.is_foreign:
+            return {
+                'warning': {
+                    'title': "Advertencia",
+                    'message': "¡¡Atencion!!, al activar la compra extranjera debe de asegurarse que la moneda usada es la correcta para la compra."
+                }
+            }
